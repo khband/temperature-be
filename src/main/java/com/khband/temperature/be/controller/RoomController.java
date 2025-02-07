@@ -35,8 +35,19 @@ public class RoomController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PatchMapping("/{id}/currentTemperature")
+    public ResponseEntity<Room> setCurrentTemperature(@PathVariable Long id, @RequestParam Double currentTemperature) {
+        return roomRepository.findById(id)
+                .map(room -> {
+                    room.setCurrentTemperature(currentTemperature);
+                    roomRepository.save(room);
+                    return ResponseEntity.ok(room);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @PatchMapping("/{id}/targetTemperature")
-    public ResponseEntity<Room> updateTargetTemperature(@PathVariable Long id, @RequestParam Double targetTemperature) {
+    public ResponseEntity<Room> setTargetTemperature(@PathVariable Long id, @RequestParam Double targetTemperature) {
         return roomRepository.findById(id)
                 .map(room -> {
                     room.setTargetTemperature(targetTemperature);

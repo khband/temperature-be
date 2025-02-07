@@ -1,2 +1,3 @@
 # Temperature BE
-To be continued..
+## Java version
+This project uses Java 21
