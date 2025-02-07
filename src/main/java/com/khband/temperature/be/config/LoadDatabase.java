@@ -10,6 +10,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collections;
+import java.util.List;
+
 @Configuration
 class LoadDatabase {
 
@@ -19,18 +22,27 @@ class LoadDatabase {
     CommandLineRunner initDatabase(RoomRepository roomRepository, BuildingRepository buildingRepository) {
 
         return args -> {
-            Room room1 = roomRepository.save(new Room("Office"));
-            log.info("Preloaded {}", room1);
-            Room room2 = roomRepository.save(new Room("Lunch Room"));
-            log.info("Preloaded {}", room2);
-            Building building1 = buildingRepository.save(new Building("Drottninggatan 24"));
-            building1.addRoom(room1);
-            buildingRepository.save(building1);
-            log.info("Preloaded {}", building1);
-            Building building2 = buildingRepository.save(new Building("Ölandsgatan 6"));
-            building2.addRoom(room2);
-            buildingRepository.save(building2);
-            log.info("Preloaded {}", building2);
+            Room room1 = saveRoom(roomRepository, "Office", 21.5);
+            Room room2 = saveRoom(roomRepository, "Lunch Room", 22.0);
+            saveBuilding(buildingRepository, "Drottninggatan 24", Collections.singletonList(room1));
+            saveBuilding(buildingRepository, "Ölandsgatan 6", Collections.singletonList(room2));
         };
+    }
+
+    private Room saveRoom(RoomRepository roomRepository, String name, Double currentTemperature) {
+        Room room = roomRepository.save(new Room(name));
+        room.setCurrentTemperature(currentTemperature);
+        roomRepository.save(room);
+        log.info("Preloaded {}", room);
+        return room;
+    }
+
+    private void saveBuilding(BuildingRepository buildingRepository, String name, List<Room> rooms) {
+        Building building1 = buildingRepository.save(new Building(name));
+        for (Room room : rooms) {
+            building1.addRoom(room);
+        }
+        buildingRepository.save(building1);
+        log.info("Preloaded {}", building1);
     }
 }
